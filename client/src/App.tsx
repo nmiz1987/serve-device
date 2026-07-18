@@ -40,7 +40,7 @@ function App() {
   return (
     <div className="app">
       <header className="header">
-        <h1>🎮 Serve Device</h1>
+        <h1>🎮 Serve Android</h1>
         <p>Android Device Control & Streaming</p>
       </header>
 

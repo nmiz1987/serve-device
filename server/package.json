@@ -1,5 +1,5 @@
 {
-  "name": "serve-device-server",
+  "name": "serve-android-server",
   "version": "0.0.1",
   "description": "Backend server for Android device streaming and control",
   "main": "dist/main.js",

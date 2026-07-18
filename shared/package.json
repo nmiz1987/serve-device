@@ -1,5 +1,5 @@
 {
-  "name": "serve-device-shared",
+  "name": "serve-android-shared",
   "version": "0.0.1",
   "description": "Shared types and utilities",
   "main": "index.ts",

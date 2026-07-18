@@ -27,7 +27,7 @@ app.use('*', async (c, next) => {
 app.get('/', (c) => {
   return c.json({
     status: 'ok',
-    message: 'Serve Device Server',
+    message: 'Serve Android Server',
     version: '0.0.1',
   })
 })

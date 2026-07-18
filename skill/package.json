@@ -1,7 +1,7 @@
 {
-  "name": "@serve-device/skill",
+  "name": "@serve-android/skill",
   "version": "1.0.0",
-  "description": "Claude AI Skill for Android device control via Serve Device",
+  "description": "Claude AI Skill for Android device control via Serve Android",
   "type": "module",
   "main": "dist/index.js",
   "exports": {

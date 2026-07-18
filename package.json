@@ -1,5 +1,5 @@
 {
-  "name": "serve-device",
+  "name": "serve-android",
   "version": "0.0.1",
   "description": "Android device control and streaming via web interface",
   "private": true,
