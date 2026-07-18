@@ -31,12 +31,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/your-username/serve-android"
+    "url": "https://github.com/nmiz1987/serve-device"
   },
   "bugs": {
-    "url": "https://github.com/your-username/serve-android/issues"
+    "url": "https://github.com/nmiz1987/serve-device/issues"
   },
-  "homepage": "https://github.com/your-username/serve-android",
+  "homepage": "https://github.com/nmiz1987/serve-device",
   "engines": {
     "node": ">=18.0.0"
   },
