@@ -50,8 +50,8 @@ if (needsBuild) {
 startServer();
 
 function startServer() {
-  console.log('🚀 Starting server on http://localhost:3000');
-  console.log('🌐 UI will be available at http://localhost:3000');
+  console.log('🚀 Starting server...');
+  console.log('🌐 UI will be available on the port shown below');
   console.log('📱 Connect an Android device to control it\n');
 
   const server = spawn('bun', ['run', 'start'], {
