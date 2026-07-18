@@ -16,6 +16,8 @@ export class StreamManager {
   private streamIntervals: Map<string, NodeJS.Timer> = new Map()
   private configs: Map<string, StreamConfig> = new Map()
   private frameIntervals: Map<string, number> = new Map()
+  private captureRunning: Map<string, boolean> = new Map()
+  private captureTimeouts: Map<string, NodeJS.Timeout> = new Map()
 
   createStreamForDevice(deviceId: string, adbClient: AdbClient): void {
     if (this.encoders.has(deviceId)) {
@@ -101,7 +103,7 @@ export class StreamManager {
   }
 
   private startFrameCapture(deviceId: string): void {
-    if (this.streamIntervals.has(deviceId)) {
+    if (this.captureRunning.get(deviceId)) {
       return
     }
 
@@ -111,15 +113,20 @@ export class StreamManager {
 
     if (!encoder || !buffer || !config) return
 
+    this.captureRunning.set(deviceId, true)
     const frameInterval = this.frameIntervals.get(deviceId) || 1000 / config.targetFps
     console.log(`Starting frame capture for device ${deviceId} at ${config.targetFps} FPS (${frameInterval}ms interval)`)
 
-    let lastCapture = Date.now()
     let frameAttempt = 0
-    const interval = setInterval(async () => {
+    let nextFrameTime = Date.now()
+
+    const captureNextFrame = async () => {
+      if (!this.captureRunning.get(deviceId)) return
+
       try {
         frameAttempt++
-        // Try to capture a frame
+
+        // Capture frame
         const frame = await encoder.captureFrame()
 
         if (frame) {
@@ -134,30 +141,39 @@ export class StreamManager {
           }
         }
 
-        const now = Date.now()
-        const elapsed = now - lastCapture
-        if (elapsed > 5000) {
-          lastCapture = now
-          const fps = Math.round((1000 / (elapsed / 300)) * 10) / 10
-          console.log(`Device ${deviceId}: ${fps} FPS, frame capture: ${encoder.getLastFrameTime()}ms`)
+        if (frameAttempt % 300 === 0) {
+          const fps = Math.round((1000 / frameInterval) * 10) / 10
+          console.log(`Device ${deviceId}: ${fps} FPS (target), frame capture: ${encoder.getLastFrameTime()}ms`)
         }
       } catch (error) {
         if (frameAttempt <= 3) {
           console.error(`Frame capture error ${frameAttempt}:`, error)
         }
       }
-    }, frameInterval)
 
-    this.streamIntervals.set(deviceId, interval)
+      // Schedule next frame
+      if (this.captureRunning.get(deviceId)) {
+        nextFrameTime += frameInterval
+        const delay = Math.max(0, nextFrameTime - Date.now())
+        const timeout = setTimeout(captureNextFrame, delay)
+        this.captureTimeouts.set(deviceId, timeout)
+      }
+    }
+
+    // Start the first frame capture
+    captureNextFrame()
   }
 
   private stopFrameCapture(deviceId: string): void {
-    const interval = this.streamIntervals.get(deviceId)
-    if (interval) {
-      clearInterval(interval)
-      this.streamIntervals.delete(deviceId)
-      console.log(`Stopped frame capture for device ${deviceId}`)
+    this.captureRunning.set(deviceId, false)
+
+    const timeout = this.captureTimeouts.get(deviceId)
+    if (timeout) {
+      clearTimeout(timeout)
+      this.captureTimeouts.delete(deviceId)
     }
+
+    console.log(`Stopped frame capture for device ${deviceId}`)
   }
 
   private broadcastFrame(deviceId: string, frame: any): void {
@@ -206,6 +222,9 @@ export class StreamManager {
   dispose(): void {
     this.streamIntervals.forEach((interval) => clearInterval(interval))
     this.streamIntervals.clear()
+    this.captureTimeouts.forEach((timeout) => clearTimeout(timeout))
+    this.captureTimeouts.clear()
+    this.captureRunning.clear()
     this.clients.clear()
     this.encoders.clear()
     this.buffers.clear()
