@@ -79,28 +79,19 @@ async function startServer() {
             // Upgrade connection to WebSocket
             const clientId = crypto.randomUUID()
 
-            try {
-              // server.upgrade handles the response, we just return undefined
-              const upgraded: any = server.upgrade(req)
+            // Upgrade the connection - this handles the HTTP response internally
+            const success = server.upgrade(req, {
+              data: { deviceId, clientId },
+            })
 
-              if (upgraded) {
-                wsConnections.set(upgraded, { deviceId, clientId })
-
-                // Initialize stream for this device if needed
-                streamManager.createStreamForDevice(deviceId, client)
-                streamManager.addClient(deviceId, upgraded, clientId)
-
-                console.log(
-                  `WebSocket upgraded for device ${deviceId}, client ${clientId}`,
-                )
-
-                // Return nothing - upgrade handles the response
-                return new Response()
-              } else {
-                return new Response('Upgrade failed', { status: 500 })
-              }
-            } catch (upgradeError) {
-              console.error('WebSocket upgrade failed:', upgradeError)
+            if (success) {
+              console.log(
+                `WebSocket upgrade requested for device ${deviceId}, client ${clientId}`,
+              )
+              // Don't return anything - let the upgrade complete
+              return undefined as any
+            } else {
+              console.error('WebSocket upgrade failed')
               return new Response('Upgrade failed', { status: 500 })
             }
           } catch (error) {
@@ -117,10 +108,21 @@ async function startServer() {
           // Handle incoming messages (for future use)
         },
         open: async (ws: any) => {
-          const conn = wsConnections.get(ws)
-          if (conn) {
+          const data = ws.data as any
+          if (data?.deviceId && data?.clientId) {
+            wsConnections.set(ws, {
+              deviceId: data.deviceId,
+              clientId: data.clientId,
+            })
+
+            const client = deviceManager.getAdbClient(data.deviceId)
+            if (client) {
+              streamManager.createStreamForDevice(data.deviceId, client)
+              streamManager.addClient(data.deviceId, ws, data.clientId)
+            }
+
             console.log(
-              `WebSocket opened: ${conn.clientId} for device ${conn.deviceId}`,
+              `WebSocket opened: ${data.clientId} for device ${data.deviceId}`,
             )
           }
         },
