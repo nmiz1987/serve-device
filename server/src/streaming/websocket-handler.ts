@@ -1,6 +1,8 @@
 import { FrameEncoder } from './encoder'
 import { FrameBuffer } from './frame-buffer'
 import { AdbClient } from '../adb/client'
+import type { StreamConfig } from '@shared/config'
+import { DEFAULT_CONFIG } from '@shared/config'
 
 interface StreamClient {
   ws: any // Bun ServerWebSocket
@@ -12,6 +14,7 @@ export class StreamManager {
   private buffers: Map<string, FrameBuffer> = new Map()
   private clients: Map<string, Set<StreamClient>> = new Map()
   private streamIntervals: Map<string, NodeJS.Timer> = new Map()
+  private configs: Map<string, StreamConfig> = new Map()
   private targetFps = 30 // Start conservative, optimize later
   private frameInterval = 1000 / this.targetFps
 
@@ -22,15 +25,17 @@ export class StreamManager {
 
     const encoder = new FrameEncoder(adbClient)
     const buffer = new FrameBuffer()
+    const config: StreamConfig = { ...DEFAULT_CONFIG }
 
     this.encoders.set(deviceId, encoder)
     this.buffers.set(deviceId, buffer)
     this.clients.set(deviceId, new Set())
+    this.configs.set(deviceId, config)
 
     this.startFrameCapture(deviceId)
   }
 
-  addClient(deviceId: string, ws: WebSocket, clientId: string): void {
+  addClient(deviceId: string, ws: any, clientId: string): void {
     if (!this.clients.has(deviceId)) {
       this.createStreamForDevice(deviceId, new AdbClient(deviceId))
     }
@@ -55,6 +60,34 @@ export class StreamManager {
         this.stopFrameCapture(deviceId)
       }
     }
+  }
+
+  getConfig(deviceId: string): StreamConfig | null {
+    return this.configs.get(deviceId) || null
+  }
+
+  updateConfig(deviceId: string, updates: Partial<StreamConfig>): void {
+    const config = this.configs.get(deviceId)
+    if (!config) {
+      throw new Error('Device not streaming')
+    }
+
+    // Validate updates
+    if (updates.targetFps && (updates.targetFps < 1 || updates.targetFps > 60)) {
+      throw new Error('targetFps must be between 1 and 60')
+    }
+
+    if (
+      updates.qualityLevel &&
+      !['low', 'medium', 'high'].includes(updates.qualityLevel)
+    ) {
+      throw new Error('Invalid qualityLevel')
+    }
+
+    // Apply updates
+    Object.assign(config, updates)
+
+    this.configs.set(deviceId, config)
   }
 
   private startFrameCapture(deviceId: string): void {
@@ -121,7 +154,7 @@ export class StreamManager {
     let deadClients: StreamClient[] = []
 
     for (const client of clients) {
-      if (client.ws.readyState === WebSocket.OPEN) {
+      if (client.ws.readyState === 1) { // WebSocket.OPEN
         try {
           client.ws.send(message)
         } catch (error) {
@@ -151,5 +184,6 @@ export class StreamManager {
     this.clients.clear()
     this.encoders.clear()
     this.buffers.clear()
+    this.configs.clear()
   }
 }

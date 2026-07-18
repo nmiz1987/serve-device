@@ -335,6 +335,71 @@ button {
   border-color: var(--color-primary);
 }
 
+/* Stream Quality */
+.stream-quality {
+  padding: 16px;
+  border-top: 1px solid var(--color-border);
+  flex-shrink: 0;
+}
+
+.stream-quality h3 {
+  font-size: 12px;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+  margin-bottom: 12px;
+}
+
+.quality-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.quality-group label {
+  font-size: 11px;
+  color: var(--color-text-secondary);
+}
+
+.quality-group select {
+  padding: 6px 8px;
+  background-color: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  color: var(--color-text);
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.quality-group select:hover {
+  border-color: var(--color-primary);
+}
+
+.fps-input {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.fps-input input[type='range'] {
+  flex: 1;
+  cursor: pointer;
+}
+
+.fps-value {
+  min-width: 40px;
+  text-align: right;
+  font-family: monospace;
+  font-size: 12px;
+  color: var(--color-text);
+}
+
+.quality-error {
+  font-size: 11px;
+  color: var(--color-error);
+  margin-top: 8px;
+}
+
 /* Empty State */
 .empty-state {
   text-align: center;

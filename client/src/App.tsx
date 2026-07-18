@@ -3,6 +3,7 @@ import type { Device } from '@shared/types'
 import DeviceSelector from './components/DeviceSelector'
 import StreamViewer from './components/StreamViewer'
 import Controls from './components/Controls'
+import StreamQuality from './components/StreamQuality'
 import { ErrorBoundary } from './components/ErrorBoundary'
 
 function App() {
@@ -51,7 +52,12 @@ function App() {
             onSelect={setSelectedDevice}
             loading={loading}
           />
-          {selectedDevice && <Controls deviceId={selectedDevice} />}
+          {selectedDevice && (
+            <>
+              <Controls deviceId={selectedDevice} />
+              <StreamQuality deviceId={selectedDevice} />
+            </>
+          )}
         </div>
 
         <div className="content">

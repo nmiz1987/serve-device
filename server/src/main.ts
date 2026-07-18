@@ -3,6 +3,7 @@ import { serve } from 'bun'
 import { DeviceManager } from './adb/device-manager'
 import { StreamManager } from './streaming/websocket-handler'
 import { createApiRoutes } from './api/routes'
+import { createStreamingConfigRoutes } from './api/streaming-config'
 
 const app = new Hono()
 const deviceManager = new DeviceManager()
@@ -33,7 +34,9 @@ app.get('/', (c) => {
 
 // API routes
 const apiRoutes = createApiRoutes(deviceManager)
+const streamingConfigRoutes = createStreamingConfigRoutes(streamManager)
 app.route('/api', apiRoutes)
+app.route('/api', streamingConfigRoutes)
 
 const PORT = Bun.env.PORT || 3000
 
