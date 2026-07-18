@@ -45,8 +45,34 @@ export class AdbClient {
   }
 
   async screencap(path: string = '/sdcard/screen.png'): Promise<Buffer> {
-    await this.shell(`screencap -p ${path}`)
-    return this.pullFile(path)
+    // First, create the screenshot file
+    await this.shell(`screencap ${path}`)
+
+    // Then cat it back as binary data
+    return new Promise((resolve, reject) => {
+      const process = spawn('adb', ['-s', this.deviceId, 'shell', 'cat', path])
+      const chunks: Buffer[] = []
+      let hasData = false
+
+      process.stdout?.on('data', (data: Buffer) => {
+        chunks.push(data)
+        hasData = true
+      })
+
+      process.stderr?.on('data', (data) => {
+        // Ignore stderr
+      })
+
+      process.on('close', (code) => {
+        if (hasData && chunks.length > 0) {
+          resolve(Buffer.concat(chunks))
+        } else {
+          reject(new Error(`Failed to read screenshot from ${path}`))
+        }
+      })
+
+      process.on('error', reject)
+    })
   }
 
   async pullFile(remotePath: string): Promise<Buffer> {
