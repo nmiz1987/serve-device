@@ -11,13 +11,14 @@ export default defineConfig({
   },
   server: {
     port: 5173,
+    strictPort: false,
     proxy: {
       '/api': {
-        target: 'http://localhost:3000',
+        target: `http://localhost:${process.env.SERVER_PORT || 3000}`,
         changeOrigin: true,
       },
       '/api/devices/': {
-        target: 'ws://localhost:3000',
+        target: `ws://localhost:${process.env.SERVER_PORT || 3000}`,
         ws: true,
       },
     },
