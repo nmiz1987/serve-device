@@ -2,11 +2,23 @@
 
 The Serve Android Skill is a TypeScript SDK that allows developers and AI agents to control Android devices programmatically.
 
-## Quick Install
+## Installation Options
 
+Choose how to install based on your needs:
+
+### Option 1: Local Installation (Recommended)
 ```bash
 npm install @serve-android/skill
 ```
+✅ Best for: Single projects, teams, CI/CD pipelines
+
+### Option 2: Global Installation
+```bash
+npm install -g @serve-android/skill
+```
+✅ Best for: Multiple projects, quick prototyping
+
+👉 **[Read Full Installation Options Guide](skill/INSTALLATION_OPTIONS.md)** for detailed comparison and examples.
 
 ## Setup
 
