@@ -1,0 +1,13 @@
+src/
+*.ts
+tsconfig.json
+.DS_Store
+*.swp
+*.swo
+~*
+.pnp
+.pnp.js
+.turbo/
+.vscode/
+.idea/
+*.log

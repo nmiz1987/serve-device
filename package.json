@@ -1,6 +1,6 @@
 {
   "name": "serve-android",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Android device control and streaming via web interface",
   "private": true,
   "workspaces": [

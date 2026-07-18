@@ -1,6 +1,6 @@
 {
   "name": "serve-android-server",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Backend server for Android device streaming and control",
   "main": "dist/main.js",
   "type": "module",
@@ -12,6 +12,15 @@
   "dependencies": {
     "hono": "^4.0.8"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/serve-android",
+    "directory": "server"
+  },
+  "bugs": {
+    "url": "https://github.com/your-username/serve-android/issues"
+  },
+  "homepage": "https://github.com/your-username/serve-android",
   "devDependencies": {
     "@types/bun": "latest",
     "typescript": "^5.3.3"

@@ -131,14 +131,7 @@ export class StreamManager {
 
         if (frame) {
           buffer.addFrame(frame)
-          if (frameAttempt <= 3) {
-            console.log(`Frame ${frameAttempt} captured: ${frame.data.length} bytes`)
-          }
           this.broadcastFrame(deviceId, frame)
-        } else {
-          if (frameAttempt <= 3) {
-            console.log(`Frame ${frameAttempt} capture returned null`)
-          }
         }
 
         if (frameAttempt % 300 === 0) {

@@ -1,4 +1,4 @@
-# Serve Device
+# Serve Android
 
 Android device control and streaming via web interface. Stream your Android device screen to a web browser and control it remotely with your mouse and keyboard.
 
@@ -51,7 +51,7 @@ Android device control and streaming via web interface. Stream your Android devi
 ## Project Structure
 
 ```
-serve-device/
+serve-android/
 ├── server/          # Bun backend (TypeScript)
 │   └── src/
 │       ├── adb/     # Android Debug Bridge integration
