@@ -1,10 +1,16 @@
 import { Hono } from 'hono'
 import { serve } from 'bun'
 import { DeviceManager } from './adb/device-manager'
+import { StreamManager } from './streaming/websocket-handler'
 import { createApiRoutes } from './api/routes'
 
 const app = new Hono()
 const deviceManager = new DeviceManager()
+const streamManager = new StreamManager()
+const wsConnections: Map<
+  WebSocket,
+  { deviceId: string; clientId: string }
+> = new Map()
 
 // CORS middleware
 app.use('*', async (c, next) => {
@@ -32,31 +38,6 @@ app.get('/', (c) => {
 const apiRoutes = createApiRoutes(deviceManager)
 app.route('/api', apiRoutes)
 
-// WebSocket handler
-app.get('/api/devices/:deviceId/stream', (c) => {
-  const deviceId = c.req.param('deviceId')
-  const device = deviceManager.getDevice(deviceId)
-
-  if (!device) {
-    return c.json({ error: 'Device not found' }, 404)
-  }
-
-  if (!Bun.env.BUN_ENV) {
-    return c.text('WebSocket upgrade not supported in this context')
-  }
-
-  // This will be handled by the Bun.serve WebSocket upgrade
-  return new Response(null, {
-    status: 101,
-    headers: {
-      Upgrade: 'websocket',
-      Connection: 'Upgrade',
-      'Sec-WebSocket-Key': c.req.header('sec-websocket-key') || '',
-      'Sec-WebSocket-Version': '13',
-    },
-  })
-})
-
 const PORT = Bun.env.PORT || 3000
 
 async function startServer() {
@@ -73,7 +54,7 @@ async function startServer() {
     const server = serve({
       port: Number(PORT),
       fetch: async (req) => {
-        // Handle WebSocket upgrade
+        // Handle WebSocket upgrade for streaming
         if (
           req.headers.get('Upgrade') === 'websocket' &&
           req.url.includes('/api/devices/') &&
@@ -81,18 +62,34 @@ async function startServer() {
         ) {
           try {
             const url = new URL(req.url)
-            const deviceId = url.pathname.split('/')[3]
+            const pathParts = url.pathname.split('/')
+            const deviceIndex = pathParts.indexOf('devices')
+            const deviceId = pathParts[deviceIndex + 1]
 
-            if (deviceManager.getDevice(deviceId)) {
-              const upgrade = server.upgrade(req)
-              if (upgrade) {
-                const ws = upgrade
-                // TODO: Implement streaming logic
-                return new Response(null, { webSocket: ws })
-              }
+            const device = deviceManager.getDevice(deviceId)
+            if (!device) {
+              return new Response('Device not found', { status: 404 })
             }
+
+            const client = deviceManager.getAdbClient(deviceId)
+            if (!client) {
+              return new Response('Device not found', { status: 404 })
+            }
+
+            // Upgrade connection to WebSocket
+            const upgraded = server.upgrade(req)
+            if (upgraded) {
+              const clientId = crypto.randomUUID()
+              wsConnections.set(upgraded, { deviceId, clientId })
+
+              // Initialize stream for this device if needed
+              streamManager.createStreamForDevice(deviceId, client)
+              streamManager.addClient(deviceId, upgraded, clientId)
+            }
+            return undefined
           } catch (error) {
             console.error('WebSocket upgrade error:', error)
+            return new Response('Upgrade failed', { status: 500 })
           }
         }
 
@@ -101,17 +98,32 @@ async function startServer() {
       },
       websocket: {
         message: async (ws, message) => {
-          // Handle WebSocket messages
-          console.log('WS message:', message)
+          // Handle incoming messages (for future use)
         },
         open: async (ws) => {
-          console.log('WebSocket connected')
+          const conn = wsConnections.get(ws)
+          if (conn) {
+            console.log(
+              `WebSocket opened: ${conn.clientId} for device ${conn.deviceId}`,
+            )
+          }
         },
         close: (ws) => {
-          console.log('WebSocket closed')
+          const conn = wsConnections.get(ws)
+          if (conn) {
+            console.log(
+              `WebSocket closed: ${conn.clientId} for device ${conn.deviceId}`,
+            )
+            streamManager.removeClient(conn.deviceId, conn.clientId)
+          }
+          wsConnections.delete(ws)
         },
         error: (ws, error) => {
-          console.error('WebSocket error:', error)
+          const conn = wsConnections.get(ws)
+          console.error(
+            `WebSocket error for ${conn?.clientId || 'unknown'}:`,
+            error,
+          )
         },
       },
     })
@@ -126,6 +138,7 @@ async function startServer() {
 // Graceful shutdown
 process.on('SIGINT', () => {
   console.log('Shutting down...')
+  streamManager.dispose()
   deviceManager.dispose()
   process.exit(0)
 })

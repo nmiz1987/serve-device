@@ -9,6 +9,7 @@ export function useDeviceStream(
   const [frameCount, setFrameCount] = useState(0)
   const [lastFrameTime, setLastFrameTime] = useState<number | null>(null)
   const frameCounterRef = useRef(0)
+  const fpsCounterRef = useRef(0)
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -53,11 +54,15 @@ export function useDeviceStream(
             ctx.drawImage(img, 0, 0)
 
             // Update FPS counter
-            frameCounterRef.current++
+            fpsCounterRef.current++
             setLastFrameTime(Date.now())
-            setFrameCount(frameCounterRef.current)
 
             URL.revokeObjectURL(url)
+          }
+
+          img.onerror = () => {
+            URL.revokeObjectURL(url)
+            console.error('Failed to decode image frame')
           }
 
           img.src = url
@@ -76,14 +81,14 @@ export function useDeviceStream(
       console.log('Stream disconnected')
     }
 
-    // Reset frame counter every second
-    const counterInterval = setInterval(() => {
-      setFrameCount(frameCounterRef.current)
-      frameCounterRef.current = 0
+    // Update displayed FPS every second
+    const fpsInterval = setInterval(() => {
+      setFrameCount(fpsCounterRef.current)
+      fpsCounterRef.current = 0
     }, 1000)
 
     return () => {
-      clearInterval(counterInterval)
+      clearInterval(fpsInterval)
       if (ws.readyState === WebSocket.OPEN) {
         ws.close()
       }
