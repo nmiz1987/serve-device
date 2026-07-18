@@ -1,4 +1,4 @@
-import type { Device } from '../../../shared/types'
+import type { Device } from '@shared/types'
 
 interface DeviceSelectorProps {
   devices: Device[]

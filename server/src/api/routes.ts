@@ -1,6 +1,6 @@
 import { Hono } from 'hono'
 import type { DeviceManager } from '../adb/device-manager'
-import type { CommandResponse, DeviceListResponse, ScreenshotResponse } from '../../shared/types'
+import type { CommandResponse, DeviceListResponse, ScreenshotResponse } from '@shared/types'
 
 export function createApiRoutes(deviceManager: DeviceManager) {
   const api = new Hono()

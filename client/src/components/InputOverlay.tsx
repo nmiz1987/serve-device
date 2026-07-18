@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react'
 import { useInputControl } from '../hooks/useInputControl'
-import { scaleCoordinates, clampCoordinates } from '../../../shared/utils'
+import { scaleCoordinates, clampCoordinates } from '@shared/utils'
 
 interface InputOverlayProps {
   deviceId: string

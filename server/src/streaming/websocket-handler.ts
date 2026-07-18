@@ -3,7 +3,7 @@ import { FrameBuffer } from './frame-buffer'
 import { AdbClient } from '../adb/client'
 
 interface StreamClient {
-  ws: WebSocket
+  ws: any // Bun ServerWebSocket
   id: string
 }
 

@@ -7,10 +7,7 @@ import { createApiRoutes } from './api/routes'
 const app = new Hono()
 const deviceManager = new DeviceManager()
 const streamManager = new StreamManager()
-const wsConnections: Map<
-  WebSocket,
-  { deviceId: string; clientId: string }
-> = new Map()
+const wsConnections: Map<any, { deviceId: string; clientId: string }> = new Map()
 
 // CORS middleware
 app.use('*', async (c, next) => {
@@ -53,7 +50,7 @@ async function startServer() {
 
     const server = serve({
       port: Number(PORT),
-      fetch: async (req) => {
+      fetch: async (req: Request): Promise<Response> => {
         // Handle WebSocket upgrade for streaming
         if (
           req.headers.get('Upgrade') === 'websocket' &&
@@ -77,16 +74,19 @@ async function startServer() {
             }
 
             // Upgrade connection to WebSocket
-            const upgraded = server.upgrade(req)
+            const clientId = crypto.randomUUID()
+            const upgraded: any = server.upgrade(req)
+
             if (upgraded) {
-              const clientId = crypto.randomUUID()
               wsConnections.set(upgraded, { deviceId, clientId })
 
               // Initialize stream for this device if needed
               streamManager.createStreamForDevice(deviceId, client)
               streamManager.addClient(deviceId, upgraded, clientId)
+              return new Response(null, { status: 101 })
             }
-            return undefined
+
+            return new Response('Upgrade failed', { status: 500 })
           } catch (error) {
             console.error('WebSocket upgrade error:', error)
             return new Response('Upgrade failed', { status: 500 })
@@ -97,10 +97,10 @@ async function startServer() {
         return app.fetch(req)
       },
       websocket: {
-        message: async (ws, message) => {
+        message: async (ws: any, message: any) => {
           // Handle incoming messages (for future use)
         },
-        open: async (ws) => {
+        open: async (ws: any) => {
           const conn = wsConnections.get(ws)
           if (conn) {
             console.log(
@@ -108,7 +108,7 @@ async function startServer() {
             )
           }
         },
-        close: (ws) => {
+        close: (ws: any) => {
           const conn = wsConnections.get(ws)
           if (conn) {
             console.log(
@@ -117,13 +117,6 @@ async function startServer() {
             streamManager.removeClient(conn.deviceId, conn.clientId)
           }
           wsConnections.delete(ws)
-        },
-        error: (ws, error) => {
-          const conn = wsConnections.get(ws)
-          console.error(
-            `WebSocket error for ${conn?.clientId || 'unknown'}:`,
-            error,
-          )
         },
       },
     })

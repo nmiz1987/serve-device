@@ -1,6 +1,6 @@
 import { spawn } from 'child_process'
-import type { Device } from '../../shared/types'
-import { parseAdbDevices } from '../../shared/utils'
+import type { Device } from '@shared/types'
+import { parseAdbDevices } from '@shared/utils'
 import { AdbClient } from './client'
 
 export class DeviceManager {
@@ -28,7 +28,8 @@ export class DeviceManager {
       }
 
       // Add or update devices
-      for (const { id, state } of deviceList) {
+      for (const item of deviceList) {
+        const { id, state } = item
         if (!this.devices.has(id)) {
           const device = await this.getDeviceInfo(id, state as any)
           if (device) {
