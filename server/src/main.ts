@@ -49,7 +49,7 @@ try {
   // Client not built yet, that's ok for development
 }
 
-const PORT = Bun.env.PORT || 3000
+let PORT = Number(Bun.env.PORT || 3000)
 
 async function startServer() {
   try {
@@ -62,8 +62,15 @@ async function startServer() {
       console.log(`  - ${d.id} (${d.model}) [${d.state}]`)
     })
 
-    const server = serve({
-      port: Number(PORT),
+    // Try to start server on available port
+    let server: any = null
+    let portAttempt = PORT
+    const maxAttempts = 20
+
+    for (let i = 0; i < maxAttempts; i++) {
+      try {
+        server = serve({
+          port: portAttempt,
       fetch: async (req: Request): Promise<Response> => {
         // Handle WebSocket upgrade for streaming
         if (
@@ -150,7 +157,27 @@ async function startServer() {
       },
     })
 
-    console.log(`✅ Server running at http://localhost:${PORT}`)
+        // Successfully started
+        PORT = portAttempt
+        console.log(`✅ Server running at http://localhost:${PORT}`)
+        break
+      } catch (error: any) {
+        // Check if it's an address in use error
+        if (error.code === 'EADDRINUSE' || error.message?.includes('port')) {
+          portAttempt++
+          if (i < maxAttempts - 1) {
+            // Try next port
+            continue
+          }
+        }
+        // If not a port error or we've exceeded max attempts, throw
+        throw error
+      }
+    }
+
+    if (!server) {
+      throw new Error(`Failed to find an available port after ${maxAttempts} attempts starting from ${PORT - maxAttempts}`)
+    }
   } catch (error) {
     console.error('Failed to start server:', error)
     process.exit(1)
