@@ -78,18 +78,31 @@ async function startServer() {
 
             // Upgrade connection to WebSocket
             const clientId = crypto.randomUUID()
-            const upgraded: any = server.upgrade(req)
 
-            if (upgraded) {
-              wsConnections.set(upgraded, { deviceId, clientId })
+            try {
+              // server.upgrade handles the response, we just return undefined
+              const upgraded: any = server.upgrade(req)
 
-              // Initialize stream for this device if needed
-              streamManager.createStreamForDevice(deviceId, client)
-              streamManager.addClient(deviceId, upgraded, clientId)
-              return new Response(null, { status: 101 })
+              if (upgraded) {
+                wsConnections.set(upgraded, { deviceId, clientId })
+
+                // Initialize stream for this device if needed
+                streamManager.createStreamForDevice(deviceId, client)
+                streamManager.addClient(deviceId, upgraded, clientId)
+
+                console.log(
+                  `WebSocket upgraded for device ${deviceId}, client ${clientId}`,
+                )
+
+                // Return nothing - upgrade handles the response
+                return new Response()
+              } else {
+                return new Response('Upgrade failed', { status: 500 })
+              }
+            } catch (upgradeError) {
+              console.error('WebSocket upgrade failed:', upgradeError)
+              return new Response('Upgrade failed', { status: 500 })
             }
-
-            return new Response('Upgrade failed', { status: 500 })
           } catch (error) {
             console.error('WebSocket upgrade error:', error)
             return new Response('Upgrade failed', { status: 500 })
