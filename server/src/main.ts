@@ -159,7 +159,8 @@ async function startServer() {
 
         // Successfully started
         PORT = portAttempt
-        console.log(`✅ Server running at http://localhost:${PORT}`)
+        console.log(`\n🌐 Open http://localhost:${PORT} in your browser`)
+        console.log(`✅ Server running at http://localhost:${PORT}\n`)
         break
       } catch (error: any) {
         // Check if it's an address in use error
