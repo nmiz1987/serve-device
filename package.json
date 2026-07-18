@@ -1,6 +1,6 @@
 {
   "name": "serve-android",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "Android device control and streaming via web interface",
   "type": "module",
   "bin": {
