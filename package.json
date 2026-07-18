@@ -1,0 +1,21 @@
+{
+  "name": "serve-device",
+  "version": "0.0.1",
+  "description": "Android device control and streaming via web interface",
+  "private": true,
+  "workspaces": [
+    "server",
+    "client",
+    "shared"
+  ],
+  "scripts": {
+    "setup": "bash scripts/setup.sh",
+    "dev": "concurrently \"bun run --cwd server dev\" \"bun run --cwd client dev\"",
+    "build": "bun run --cwd server build && bun run --cwd client build",
+    "type-check": "tsc --noEmit --workspaceRoot"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.0",
+    "typescript": "^5.3.3"
+  }
+}

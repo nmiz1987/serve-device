@@ -1,0 +1,19 @@
+{
+  "name": "serve-device-server",
+  "version": "0.0.1",
+  "description": "Backend server for Android device streaming and control",
+  "main": "dist/main.js",
+  "type": "module",
+  "scripts": {
+    "dev": "bun run --watch src/main.ts",
+    "build": "bun build src/main.ts --outdir dist --target bun",
+    "start": "bun dist/main.js"
+  },
+  "dependencies": {
+    "hono": "^4.0.8"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "typescript": "^5.3.3"
+  }
+}

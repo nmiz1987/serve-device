@@ -1,0 +1,7 @@
+{
+  "name": "serve-device-shared",
+  "version": "0.0.1",
+  "description": "Shared types and utilities",
+  "main": "index.ts",
+  "type": "module"
+}
