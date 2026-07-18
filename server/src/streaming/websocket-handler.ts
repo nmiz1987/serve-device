@@ -15,8 +15,7 @@ export class StreamManager {
   private clients: Map<string, Set<StreamClient>> = new Map()
   private streamIntervals: Map<string, NodeJS.Timer> = new Map()
   private configs: Map<string, StreamConfig> = new Map()
-  private targetFps = 30 // Start conservative, optimize later
-  private frameInterval = 1000 / this.targetFps
+  private frameIntervals: Map<string, number> = new Map()
 
   createStreamForDevice(deviceId: string, adbClient: AdbClient): void {
     if (this.encoders.has(deviceId)) {
@@ -31,6 +30,7 @@ export class StreamManager {
     this.buffers.set(deviceId, buffer)
     this.clients.set(deviceId, new Set())
     this.configs.set(deviceId, config)
+    this.frameIntervals.set(deviceId, 1000 / config.targetFps)
 
     this.startFrameCapture(deviceId)
   }
@@ -87,6 +87,16 @@ export class StreamManager {
     // Apply updates
     Object.assign(config, updates)
 
+    // Update frame interval if FPS changed and restart capture
+    if (updates.targetFps) {
+      this.frameIntervals.set(deviceId, 1000 / updates.targetFps)
+      console.log(`Updated target FPS for device ${deviceId} to ${updates.targetFps}`)
+
+      // Restart frame capture with new interval
+      this.stopFrameCapture(deviceId)
+      this.startFrameCapture(deviceId)
+    }
+
     this.configs.set(deviceId, config)
   }
 
@@ -97,10 +107,12 @@ export class StreamManager {
 
     const encoder = this.encoders.get(deviceId)
     const buffer = this.buffers.get(deviceId)
+    const config = this.configs.get(deviceId)
 
-    if (!encoder || !buffer) return
+    if (!encoder || !buffer || !config) return
 
-    console.log(`Starting frame capture for device ${deviceId} at ${this.targetFps} FPS`)
+    const frameInterval = this.frameIntervals.get(deviceId) || 1000 / config.targetFps
+    console.log(`Starting frame capture for device ${deviceId} at ${config.targetFps} FPS (${frameInterval}ms interval)`)
 
     let lastCapture = Date.now()
     let frameAttempt = 0
@@ -134,7 +146,7 @@ export class StreamManager {
           console.error(`Frame capture error ${frameAttempt}:`, error)
         }
       }
-    }, this.frameInterval)
+    }, frameInterval)
 
     this.streamIntervals.set(deviceId, interval)
   }
@@ -191,12 +203,6 @@ export class StreamManager {
     })
   }
 
-  setTargetFps(fps: number): void {
-    this.targetFps = fps
-    this.frameInterval = 1000 / fps
-    console.log(`Target FPS set to ${fps}`)
-  }
-
   dispose(): void {
     this.streamIntervals.forEach((interval) => clearInterval(interval))
     this.streamIntervals.clear()
@@ -204,5 +210,6 @@ export class StreamManager {
     this.encoders.clear()
     this.buffers.clear()
     this.configs.clear()
+    this.frameIntervals.clear()
   }
 }
