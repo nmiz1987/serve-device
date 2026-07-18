@@ -4,6 +4,8 @@ export function useDeviceStream(
   deviceId: string,
   canvasRef: React.RefObject<HTMLCanvasElement>,
   setError: (error: string | null) => void,
+  setIsConnecting?: (connecting: boolean) => void,
+  setDeviceResolution?: (resolution: { width: number; height: number }) => void,
 ) {
   const wsRef = useRef<WebSocket | null>(null)
   const [frameCount, setFrameCount] = useState(0)
@@ -28,6 +30,7 @@ export function useDeviceStream(
     ws.onopen = () => {
       console.log('Connected to device stream')
       setError(null)
+      setIsConnecting?.(false)
     }
 
     ws.onmessage = async (event) => {
@@ -35,6 +38,11 @@ export function useDeviceStream(
         const data = JSON.parse(event.data)
 
         if (data.type === 'frame') {
+          // Update device resolution if provided
+          if (setDeviceResolution && data.width && data.height) {
+            setDeviceResolution({ width: data.width, height: data.height })
+          }
+
           // Decode base64 frame data
           const binaryString = atob(data.data)
           const bytes = new Uint8Array(binaryString.length)
@@ -75,10 +83,12 @@ export function useDeviceStream(
     ws.onerror = (error) => {
       console.error('WebSocket error:', error)
       setError('Connection error')
+      setIsConnecting?.(true)
     }
 
     ws.onclose = () => {
       console.log('Stream disconnected')
+      setIsConnecting?.(true)
     }
 
     // Update displayed FPS every second

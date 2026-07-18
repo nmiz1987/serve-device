@@ -3,6 +3,7 @@ import type { Device } from '@shared/types'
 import DeviceSelector from './components/DeviceSelector'
 import StreamViewer from './components/StreamViewer'
 import Controls from './components/Controls'
+import { ErrorBoundary } from './components/ErrorBoundary'
 
 function App() {
   const [devices, setDevices] = useState<Device[]>([])
@@ -57,7 +58,9 @@ function App() {
           {error && <div className="error">{error}</div>}
           {loading && <div className="loading">Loading devices...</div>}
           {!loading && selectedDevice ? (
-            <StreamViewer deviceId={selectedDevice} />
+            <ErrorBoundary>
+              <StreamViewer deviceId={selectedDevice} />
+            </ErrorBoundary>
           ) : !loading && devices.length === 0 ? (
             <div className="empty-state">
               <p>No Android devices found</p>
