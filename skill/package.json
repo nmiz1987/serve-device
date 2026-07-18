@@ -1,0 +1,33 @@
+{
+  "name": "@serve-device/skill",
+  "version": "1.0.0",
+  "description": "Claude AI Skill for Android device control via Serve Device",
+  "type": "module",
+  "main": "dist/index.js",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "type-check": "tsc --noEmit",
+    "dev": "tsc --watch"
+  },
+  "keywords": [
+    "android",
+    "device",
+    "automation",
+    "testing",
+    "claude",
+    "ai-skill"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.3.3"
+  },
+  "dependencies": {}
+}
