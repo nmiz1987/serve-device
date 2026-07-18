@@ -24,29 +24,47 @@ Android device control and streaming via web interface. Stream your Android devi
 
 ## Quick Start
 
-1. **Install dependencies**
-   ```bash
-   bun install
-   # or
-   npm install
-   ```
+### For End Users (Web UI)
 
-2. **Connect your Android device**
+1. **Connect your Android device**
    - USB: Connect via USB cable and enable USB debugging
    - Emulator: Start an Android emulator
    - Verify: `adb devices`
 
-3. **Start the development server**
+2. **Start Serve Android**
    ```bash
-   bun run dev
-   # or
-   npm run dev
+   npx serve-android
+   # or with bun
+   bunx serve-android
    ```
 
-4. **Open your browser**
-   - Navigate to `http://localhost:5173`
+3. **Open your browser**
+   - Navigate to `http://localhost:3000`
    - Select a device from the dropdown
    - Start controlling!
+
+### For Developers (Using the Skill SDK)
+
+1. **Install the skill in your project**
+   ```bash
+   npm install @serve-android/skill
+   ```
+
+2. **Start the Serve Android server**
+   ```bash
+   npx serve-android
+   ```
+
+3. **Use the SDK in your code**
+   ```typescript
+   import { ServeDeviceClient } from '@serve-android/skill'
+   
+   const client = new ServeDeviceClient('http://localhost:3000')
+   const devices = await client.getDevices()
+   await client.tap(devices[0].id, 540, 960)
+   ```
+
+📖 [Read the Skill Installation Guide](INSTALL_SKILL.md) for more examples and use cases.
 
 ## Project Structure
 

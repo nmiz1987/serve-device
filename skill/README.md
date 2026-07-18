@@ -1,17 +1,17 @@
-# Serve Device AI Skill
+# Serve Android AI Skill
 
 Control Android devices programmatically with Claude AI. This TypeScript SDK enables AI agents to take screenshots, interact with device UI, and automate testing flows.
 
 ## Installation
 
 ```bash
-npm install @serve-device/skill
+npm install @serve-android/skill
 ```
 
 ## Quick Start
 
 ```typescript
-import { ServeDeviceClient } from '@serve-device/skill'
+import { ServeDeviceClient } from '@serve-android/skill'
 
 // Create client pointing to your Serve Device server
 const client = new ServeDeviceClient('http://localhost:3000')
@@ -429,7 +429,7 @@ const client = new ServeDeviceClient('http://localhost:3000', 60000)
 
 ## Contributing
 
-Issues and pull requests welcome! Please report bugs at the [project repository](https://github.com/anthropics/serve-device).
+Issues and pull requests welcome! Please report bugs at the [project repository](https://github.com/nmiz1987/serve-device).
 
 ## License
 
