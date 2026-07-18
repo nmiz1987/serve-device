@@ -5,14 +5,14 @@ Control Android devices programmatically with Claude AI. This TypeScript SDK ena
 ## Installation
 
 ```bash
-npm install @serve-android/skill
+npm install serve-android-skill
 ```
 
 **📋 Choose Your Installation Method**
 
 - **Local Installation** (Recommended): Install in your project for version control
   ```bash
-  npm install @serve-android/skill
+  npm install serve-android-skill
   ```
 
 - **Global Installation**: Install once, use in all projects

@@ -8,7 +8,7 @@ Choose how to install based on your needs:
 
 ### Option 1: Local Installation (Recommended)
 ```bash
-npm install @serve-android/skill
+npm install serve-android-skill
 ```
 ✅ Best for: Single projects, teams, CI/CD pipelines
 

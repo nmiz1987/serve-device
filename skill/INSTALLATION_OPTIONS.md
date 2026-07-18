@@ -20,13 +20,13 @@ Install the skill as a dependency in your project.
 ### Installation
 
 ```bash
-npm install @serve-android/skill
+npm install serve-android-skill
 ```
 
 ### Usage
 
 ```typescript
-import { ServeDeviceClient } from '@serve-android/skill'
+import { ServeDeviceClient } from 'serve-android-skill'
 
 const client = new ServeDeviceClient('http://localhost:3000')
 const devices = await client.getDevices()
@@ -54,9 +54,9 @@ const devices = await client.getDevices()
 
 ```
 my-project/
-├── package.json          # Contains "@serve-android/skill": "^0.1.0"
+├── package.json          # Contains "serve-android-skill": "^0.1.0"
 ├── node_modules/
-│   └── @serve-android/skill/
+│   └── serve-android-skill/
 ├── index.js
 └── README.md
 ```
@@ -70,13 +70,13 @@ Install the skill globally on your system.
 ### Installation
 
 ```bash
-npm install -g @serve-android/skill
+npm install -g serve-android-skill
 ```
 
 ### Usage
 
 ```typescript
-import { ServeDeviceClient } from '@serve-android/skill'
+import { ServeDeviceClient } from 'serve-android-skill'
 
 const client = new ServeDeviceClient('http://localhost:3000')
 const devices = await client.getDevices()
@@ -110,7 +110,7 @@ From anywhere:
 serve-android-skill
 
 # Use in any project without installation
-import { ServeDeviceClient } from '@serve-android/skill'
+import { ServeDeviceClient } from 'serve-android-skill'
 ```
 
 ---
@@ -121,7 +121,7 @@ When you first install the skill, run:
 
 ```bash
 # For local installation
-npx @serve-android/skill
+npx serve-android-skill
 
 # For global installation
 serve-android-skill
@@ -137,20 +137,20 @@ This opens an interactive guide to help you choose the best installation method.
 
 ```bash
 # Uninstall from project
-npm uninstall @serve-android/skill
+npm uninstall serve-android-skill
 
 # Install globally
-npm install -g @serve-android/skill
+npm install -g serve-android-skill
 ```
 
 ### From Global to Local
 
 ```bash
 # Uninstall from global
-npm uninstall -g @serve-android/skill
+npm uninstall -g serve-android-skill
 
 # Install in your project
-npm install @serve-android/skill
+npm install serve-android-skill
 ```
 
 ---
@@ -161,24 +161,24 @@ npm install @serve-android/skill
 
 ```bash
 # Check project version
-npm list @serve-android/skill
+npm list serve-android-skill
 
 # Check global version
-npm list -g @serve-android/skill
+npm list -g serve-android-skill
 ```
 
 ### Update Skills
 
 ```bash
 # Update local installation
-npm update @serve-android/skill
+npm update serve-android-skill
 
 # Update global installation
-npm update -g @serve-android/skill
+npm update -g serve-android-skill
 
 # Update to specific version
-npm install @serve-android/skill@0.2.0
-npm install -g @serve-android/skill@0.2.0
+npm install serve-android-skill@0.2.0
+npm install -g serve-android-skill@0.2.0
 ```
 
 ### Pin Version (Local Only)
@@ -188,7 +188,7 @@ In `package.json`:
 ```json
 {
   "dependencies": {
-    "@serve-android/skill": "0.1.0"    // Exact version
+    "serve-android-skill": "0.1.0"    // Exact version
   }
 }
 ```
@@ -201,7 +201,7 @@ In `package.json`:
 
 ```bash
 # Use without installing
-npx @serve-android/skill
+npx serve-android-skill
 
 # Shows installation options and documentation
 ```
@@ -210,13 +210,13 @@ npx @serve-android/skill
 
 **Local:**
 ```typescript
-import { ServeDeviceClient } from '@serve-android/skill'
+import { ServeDeviceClient } from 'serve-android-skill'
 const client = new ServeDeviceClient('http://localhost:3000')
 ```
 
 **Global:**
 ```typescript
-import { ServeDeviceClient } from '@serve-android/skill'
+import { ServeDeviceClient } from 'serve-android-skill'
 const client = new ServeDeviceClient('http://localhost:3000')
 ```
 
@@ -243,7 +243,7 @@ serve-android-skill
 - name: Install dependencies
   run: npm ci
 
-# @serve-android/skill is installed from package-lock.json
+# serve-android-skill is installed from package-lock.json
 ```
 
 ### Docker (Recommended: Local)
@@ -255,7 +255,7 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm ci
 
-# @serve-android/skill is installed
+# serve-android-skill is installed
 COPY . .
 CMD ["node", "index.js"]
 ```
@@ -264,7 +264,7 @@ CMD ["node", "index.js"]
 
 ```yaml
 - name: Install Serve Android Skill
-  run: npm install -g @serve-android/skill
+  run: npm install -g serve-android-skill
 
 - name: Run script
   run: node index.js
@@ -274,20 +274,20 @@ CMD ["node", "index.js"]
 
 ## Troubleshooting
 
-### "Cannot find module '@serve-android/skill'"
+### "Cannot find module 'serve-android-skill'"
 
-**Local installation**: Make sure you ran `npm install @serve-android/skill`
+**Local installation**: Make sure you ran `npm install serve-android-skill`
 
 ```bash
-npm install @serve-android/skill
-npm list @serve-android/skill  # Verify installation
+npm install serve-android-skill
+npm list serve-android-skill  # Verify installation
 ```
 
-**Global installation**: Make sure you ran `npm install -g @serve-android/skill`
+**Global installation**: Make sure you ran `npm install -g serve-android-skill`
 
 ```bash
-npm install -g @serve-android/skill
-npm list -g @serve-android/skill  # Verify installation
+npm install -g serve-android-skill
+npm list -g serve-android-skill  # Verify installation
 ```
 
 ### Different versions in different projects
@@ -296,10 +296,10 @@ Use local installation for each project:
 
 ```bash
 cd project-a
-npm install @serve-android/skill@0.1.0
+npm install serve-android-skill@0.1.0
 
 cd project-b
-npm install @serve-android/skill@0.2.0
+npm install serve-android-skill@0.2.0
 ```
 
 ### Global installation not working
@@ -307,10 +307,10 @@ npm install @serve-android/skill@0.2.0
 Verify npm global path:
 
 ```bash
-npm list -g @serve-android/skill
+npm list -g serve-android-skill
 
 # If not found, reinstall
-npm install -g @serve-android/skill
+npm install -g serve-android-skill
 ```
 
 ### Permission denied (macOS/Linux)
@@ -318,7 +318,7 @@ npm install -g @serve-android/skill
 Use `sudo` for global installation:
 
 ```bash
-sudo npm install -g @serve-android/skill
+sudo npm install -g serve-android-skill
 ```
 
 Or configure npm to use a different directory:
@@ -342,7 +342,7 @@ After installation:
 
 2. **Use in Your Project**
    ```typescript
-   import { ServeDeviceClient } from '@serve-android/skill'
+   import { ServeDeviceClient } from 'serve-android-skill'
    const client = new ServeDeviceClient('http://localhost:3000')
    ```
 
@@ -359,10 +359,10 @@ After installation:
 A: Yes, they don't conflict. The local version takes precedence in your project.
 
 **Q: Which version am I using?**
-A: Local takes precedence. Check with `npm list @serve-android/skill`.
+A: Local takes precedence. Check with `npm list serve-android-skill`.
 
 **Q: Can I downgrade/upgrade easily?**
-A: Yes, with `npm install @serve-android/skill@VERSION`.
+A: Yes, with `npm install serve-android-skill@VERSION`.
 
 **Q: Is global installation safe?**
 A: Yes, global installations don't affect system files or other applications.
