@@ -52,19 +52,25 @@ export class AdbClient {
   async pullFile(remotePath: string): Promise<Buffer> {
     return new Promise((resolve, reject) => {
       const args = ['-s', this.deviceId, 'pull', remotePath, '-']
-      const process = spawn('adb', args)
+      const process = spawn('adb', args, { stdio: ['ignore', 'pipe', 'pipe'] })
       const chunks: Buffer[] = []
+      let hasData = false
 
       process.stdout?.on('data', (data: Buffer) => {
         chunks.push(data)
+        hasData = true
       })
 
       process.stderr?.on('data', (data) => {
-        // Ignore stderr for pull command (contains progress)
+        // Ignore stderr for pull command (contains progress info)
       })
 
       process.on('close', (code) => {
-        if (code === 0) {
+        // adb pull might exit with non-zero even when successful (progress goes to stderr)
+        // Check if we actually got data
+        if (hasData || chunks.length > 0) {
+          resolve(Buffer.concat(chunks))
+        } else if (code === 0) {
           resolve(Buffer.concat(chunks))
         } else {
           reject(new Error(`Failed to pull file ${remotePath}`))
