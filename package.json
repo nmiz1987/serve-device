@@ -2,7 +2,10 @@
   "name": "serve-android",
   "version": "0.1.0",
   "description": "Android device control and streaming via web interface",
-  "private": true,
+  "type": "module",
+  "bin": {
+    "serve-android": "./bin/serve-android.js"
+  },
   "workspaces": [
     "server",
     "client",
@@ -12,7 +15,30 @@
     "setup": "bash scripts/setup.sh",
     "dev": "concurrently \"bun run --cwd server dev\" \"bun run --cwd client dev\"",
     "build": "bun run --cwd server build && bun run --cwd client build",
+    "build:client": "bun run --cwd client build",
+    "start:prod": "bun run --cwd server start",
     "type-check": "tsc --noEmit --workspaceRoot"
+  },
+  "keywords": [
+    "android",
+    "device",
+    "streaming",
+    "control",
+    "adb",
+    "remote"
+  ],
+  "author": "",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/serve-android"
+  },
+  "bugs": {
+    "url": "https://github.com/your-username/serve-android/issues"
+  },
+  "homepage": "https://github.com/your-username/serve-android",
+  "engines": {
+    "node": ">=18.0.0"
   },
   "devDependencies": {
     "concurrently": "^8.2.0",

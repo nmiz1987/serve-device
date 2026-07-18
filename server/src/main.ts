@@ -1,5 +1,7 @@
 import { Hono } from 'hono'
 import { serve } from 'bun'
+import { serveStatic } from 'hono/bun'
+import path from 'path'
 import { DeviceManager } from './adb/device-manager'
 import { StreamManager } from './streaming/websocket-handler'
 import { createApiRoutes } from './api/routes'
@@ -37,6 +39,15 @@ const apiRoutes = createApiRoutes(deviceManager)
 const streamingConfigRoutes = createStreamingConfigRoutes(streamManager)
 app.route('/api', apiRoutes)
 app.route('/api', streamingConfigRoutes)
+
+// Serve static files from built client
+const clientDistPath = path.join(process.cwd(), '..', 'client', 'dist')
+try {
+  app.use('/*', serveStatic({ root: clientDistPath }))
+  app.get('/', serveStatic({ path: 'index.html', root: clientDistPath }))
+} catch (error) {
+  // Client not built yet, that's ok for development
+}
 
 const PORT = Bun.env.PORT || 3000
 

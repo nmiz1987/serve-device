@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Initial release of Serve Android
+- CLI entrypoint: `npx serve-android` / `bunx serve-android`
 - Real-time Android device screen streaming via WebSocket
 - Remote device control (tap, swipe, type, key events)
 - Web-based UI for device control and streaming
@@ -19,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Screenshot capture endpoint
 - Quality level settings (low, medium, high)
 - Claude AI Skill SDK for device automation
+- Automatic build and startup on first run
 
 ### Fixed
 - FPS setting now properly applied to frame capture
