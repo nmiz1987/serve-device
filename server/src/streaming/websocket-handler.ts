@@ -103,14 +103,23 @@ export class StreamManager {
     console.log(`Starting frame capture for device ${deviceId} at ${this.targetFps} FPS`)
 
     let lastCapture = Date.now()
+    let frameAttempt = 0
     const interval = setInterval(async () => {
       try {
+        frameAttempt++
         // Try to capture a frame
         const frame = await encoder.captureFrame()
 
         if (frame) {
           buffer.addFrame(frame)
+          if (frameAttempt <= 3) {
+            console.log(`Frame ${frameAttempt} captured: ${frame.data.length} bytes`)
+          }
           this.broadcastFrame(deviceId, frame)
+        } else {
+          if (frameAttempt <= 3) {
+            console.log(`Frame ${frameAttempt} capture returned null`)
+          }
         }
 
         const now = Date.now()
@@ -121,7 +130,9 @@ export class StreamManager {
           console.log(`Device ${deviceId}: ${fps} FPS, frame capture: ${encoder.getLastFrameTime()}ms`)
         }
       } catch (error) {
-        console.error(`Frame capture error for ${deviceId}:`, error)
+        if (frameAttempt <= 3) {
+          console.error(`Frame capture error ${frameAttempt}:`, error)
+        }
       }
     }, this.frameInterval)
 
@@ -139,7 +150,9 @@ export class StreamManager {
 
   private broadcastFrame(deviceId: string, frame: any): void {
     const clients = this.clients.get(deviceId)
-    if (!clients) return
+    if (!clients || clients.size === 0) {
+      return
+    }
 
     const message = JSON.stringify({
       type: 'frame',
@@ -152,11 +165,13 @@ export class StreamManager {
     })
 
     let deadClients: StreamClient[] = []
+    let sentCount = 0
 
     for (const client of clients) {
       if (client.ws.readyState === 1) { // WebSocket.OPEN
         try {
           client.ws.send(message)
+          sentCount++
         } catch (error) {
           console.error(`Failed to send frame to client ${client.id}:`, error)
           deadClients.push(client)
@@ -164,6 +179,10 @@ export class StreamManager {
       } else {
         deadClients.push(client)
       }
+    }
+
+    if (sentCount > 0 && frame.frameNumber <= 3) {
+      console.log(`Frame ${frame.frameNumber} broadcast to ${sentCount} clients`)
     }
 
     // Clean up dead connections
